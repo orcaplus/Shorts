@@ -7,7 +7,7 @@ import com.lagradost.cloudstream3.utils.AppUtils.toJson
 import com.lagradost.cloudstream3.utils.AppUtils.tryParseJson
 import com.lagradost.cloudstream3.utils.*
 
-class Dramabox : MainAPI() {
+class DramaBox : MainAPI() {
     override var mainUrl = "https://drama.sansekai.my.id/"
     override var name = "DramaBox🫰"
     override var lang = "id"
