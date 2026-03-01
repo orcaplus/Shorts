@@ -1,4 +1,4 @@
-name: Build
+name: Build Plugin
 
 on:
   push:
@@ -10,10 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Setup Java
+      - name: Setup JDK
         uses: actions/setup-java@v3
         with:
           distribution: temurin
@@ -22,5 +21,11 @@ jobs:
       - name: Grant permission
         run: chmod +x gradlew
 
-      - name: Build CS3
-        run: ./gradlew make
+      - name: Build Plugin
+        run: ./gradlew makePlugin
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: cs3-plugin
+          path: build/*.cs3
