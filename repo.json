@@ -1,0 +1,9 @@
+{
+    "name": "Shorts",
+    "description": "Cloudstream shorts collection",
+    "iconUrl": "https://avata",
+    "manifestVersion": 1,
+    "pluginLists": [
+      "https://raw.githubusercontent.com/orcaplus/Shorts/builds/plugins.json"
+    ]
+}
