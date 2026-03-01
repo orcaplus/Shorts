@@ -44,13 +44,13 @@ subprojects {
     apply(plugin = "com.lagradost.cloudstream3.gradle")
 
     cloudstream {
-    setRepo(System.getenv("GITHUB_REPOSITORY") ?: "https://github.com/duro92/ExtCloud")
-    authors = listOf("duro92")
+    setRepo(System.getenv("GITHUB_REPOSITORY") ?: "https://github.com/orcaplus/Shorts")
+    authors = listOf("orcaplus")
         }
 
 
     android {
-        namespace = "com.excloud"
+        namespace = "repo.plusorca.cloudstream"
 
         defaultConfig {
             minSdk = 21
