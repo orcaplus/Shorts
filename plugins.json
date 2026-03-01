@@ -1,20 +1,23 @@
 [
-  {
-    "iconUrl": "https://raw.githubusercontent.com/orcaplus/png/main/orcaplus.png",
-    "apiVersion": 3,
-    "repositoryUrl": "https://github.com/orcaplus/Shorts",
-    "status": 1,
-    "language": "id",
-    "authors": [
-      "orcaplus"
-    ],
-    "tvTypes": [
-      "TvSeries",
-      "AsianDrama"
-    ],
-    "version": 1,
-    "internalName": "DramaBox",
-    "url": "https://raw.githubusercontent.com/orcaplus/Shorts/builds/DramaBox.cs3",
-    "name": "DramaBox"
-  }
+    {
+        "url": "https://raw.githubusercontent.com/orcaplus/Shorts/builds/DramaBox.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "DramaBox",
+        "internalName": "DramaBox",
+        "authors": [
+            "orcaplus"
+        ],
+        "fileSize": 24552,
+        "repositoryUrl": "https://github.com/orcaplus/Shorts",
+        "language": "id",
+        "tvTypes": [
+            "TvSeries",
+            "AsianDrama"
+        ],
+        "iconUrl": "https://raw.githubusercontent.com/orcaplus/png/refs/heads/main/orcaplus.png",
+        "apiVersion": 1,
+        "jarFileSize": 113003,
+        "jarUrl": "https://raw.githubusercontent.com/orcaplus/Shorts/builds/DramaBox.jar"
+    }
 ]
