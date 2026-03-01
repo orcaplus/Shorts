@@ -9,7 +9,7 @@ import com.lagradost.cloudstream3.utils.*
 
 class Dramabox : MainAPI() {
     override var mainUrl = "https://drama.sansekai.my.id/"
-    override var name = "Dramabox🫰"
+    override var name = "DramaBox🫰"
     override var lang = "id"
     override val hasMainPage = true
     override val hasQuickSearch = true
@@ -107,7 +107,7 @@ class Dramabox : MainAPI() {
         val tags = detail.tags.orEmpty()
 
         return newTvSeriesLoadResponse(
-            name = detail.bookName ?: "Dramabox",
+            name = detail.bookName ?: "DramaBox",
             url = url,
             type = TvType.AsianDrama,
             episodes = episodes
