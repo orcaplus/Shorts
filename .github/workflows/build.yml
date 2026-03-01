@@ -1,32 +1,26 @@
-name: Build CS3
+name: Build
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - run: chmod +x gradlew
-
-      - uses: actions/setup-java@v3
+      - name: Setup Java
+        uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 17
 
-      - run: ./gradlew make
+      - name: Grant permission
+        run: chmod +x gradlew
 
-      - name: Push CS3 only
-        run: |
-          git config --global user.name github-actions
-          git config --global user.email github-actions@github.com
-          git fetch origin builds
-          git switch builds
-          cp build/plugins/*.cs3 .
-          git add *.cs3
-          git commit -m "Update CS3"
-          git push
+      - name: Build CS3
+        run: ./gradlew make
