@@ -18,4 +18,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "RepoPlusorcaCloudStream"
-include(":app", ":library", ":docs")
+include(":app", ":library")
