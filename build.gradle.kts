@@ -97,7 +97,6 @@ subprojects {
         implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3") // Untuk serialisasi/deserialisasi JSON
         implementation("app.cash.quickjs:quickjs-android:0.9.2") // Untuk JavaScript engine
         implementation("com.squareup.okhttp3:okhttp:4.12.0") // Untuk HTTP requests
-        implementation("androidx.core:core-ktx:1.16.0") // Untuk Log dan utilitas Android
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1") // Untuk coroutines
 
     }
