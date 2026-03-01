@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Setup JDK
-        uses: actions/setup-java@v3
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
@@ -24,8 +24,8 @@ jobs:
       - name: Build Plugin
         run: ./gradlew makePlugin
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+      - name: Upload CS3
+        uses: actions/upload-artifact@v4
         with:
-          name: cs3-plugin
+          name: DramaBox
           path: build/*.cs3
