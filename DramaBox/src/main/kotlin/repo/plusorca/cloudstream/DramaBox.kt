@@ -8,7 +8,7 @@ import com.lagradost.cloudstream3.utils.AppUtils.tryParseJson
 import com.lagradost.cloudstream3.utils.*
 
 class DramaBox : MainAPI() {
-    override var mainUrl = "https://drama.sansekai.my.id/"
+    override var mainUrl = "https://dramabox-beta-hazel.vercel.app"
     override var name = "DramaBox🫰"
     override var lang = "id"
     override val hasMainPage = true
