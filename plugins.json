@@ -8,7 +8,7 @@
         "authors": [
             "orcaplus"
         ],
-        "fileSize": 24552,
+        "fileSize": 24547,
         "repositoryUrl": "https://github.com/orcaplus/Shorts",
         "language": "id",
         "tvTypes": [
@@ -17,7 +17,7 @@
         ],
         "iconUrl": "https://raw.githubusercontent.com/orcaplus/png/refs/heads/main/orcaplus.png",
         "apiVersion": 1,
-        "jarFileSize": 113003,
+        "jarFileSize": 113012,
         "jarUrl": "https://raw.githubusercontent.com/orcaplus/Shorts/builds/DramaBox.jar"
     }
 ]
