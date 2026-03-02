@@ -19,5 +19,25 @@
         "apiVersion": 1,
         "jarFileSize": 113012,
         "jarUrl": "https://raw.githubusercontent.com/orcaplus/Shorts/builds/DramaBox.jar"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/orcaplus/Shorts/builds/ReelShort.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "ReelShort",
+        "internalName": "ReelShort",
+        "authors": [
+            "orcaplus"
+        ],
+        "repositoryUrl": "https://github.com/orcaplus/Shorts",
+        "language": "id",
+        "tvTypes": [
+            "TvSeries",
+            "AsianDrama"
+        ],
+        "iconUrl": "https://raw.githubusercontent.com/orcaplus/png/refs/heads/main/orcaplus.png",
+        "apiVersion": 1,
+        "jarFileSize": 22,
+        "jarUrl": "https://raw.githubusercontent.com/orcaplus/Shorts/builds/ReelShort.jar"
     }
 ]
