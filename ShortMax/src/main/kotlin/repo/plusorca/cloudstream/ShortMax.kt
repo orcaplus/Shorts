@@ -1,6 +1,7 @@
 package repo.plusorca.cloudstream
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.AppUtils.parseJson
 import com.lagradost.cloudstream3.utils.AppUtils.toJson
@@ -17,6 +18,7 @@ class ShortMax : MainAPI() {
 
     companion object {
         private const val TIMEOUT = 30000L
+        private val mapper = jacksonObjectMapper()
     }
 
     override val mainPage = mainPageOf(
@@ -32,7 +34,7 @@ class ShortMax : MainAPI() {
 
         return newTvSeriesSearchResponse(
             title,
-            id, // Langsung gunakan ID, URL akan dibentuk di load()
+            id,
             TvType.AsianDrama
         ) {
             this.posterUrl = coverWap?.fixUrl()
@@ -55,14 +57,28 @@ class ShortMax : MainAPI() {
             wrapper?.result?.let { return it }
             wrapper?.list?.let { return it }
             
-            // Coba parse sebagai Map
+            // Coba parse sebagai Map dengan pendekatan berbeda (tanpa mapper)
             val mapWrapper = tryParseJson<Map<String, Any>>(response)
             mapWrapper?.let { map ->
                 val dataField = map["data"] ?: map["result"] ?: map["list"]
                 if (dataField != null) {
-                    // Konversi ke JSON string lalu parse
-                    val jsonString = mapper.writeValueAsString(dataField)
-                    tryParseJson<List<DramaItem>>(jsonString)?.let { return it }
+                    // Gunakan toString() sebagai alternatif sederhana
+                    // atau coba parse langsung dengan tipe yang sesuai
+                    @Suppress("UNCHECKED_CAST")
+                    if (dataField is List<*>) {
+                        return (dataField as List<Map<String, Any>>).mapNotNull { item ->
+                            DramaItem(
+                                bookId = item["bookId"]?.toString(),
+                                bookName = item["bookName"]?.toString(),
+                                coverWap = item["coverWap"]?.toString(),
+                                chapterCount = (item["chapterCount"] as? Int) ?: (item["chapterCount"]?.toString()?.toIntOrNull()),
+                                introduction = item["introduction"]?.toString(),
+                                tags = (item["tags"] as? List<String>),
+                                score = (item["score"] as? Double) ?: (item["score"]?.toString()?.toDoubleOrNull()),
+                                releaseYear = (item["releaseYear"] as? Int) ?: (item["releaseYear"]?.toString()?.toIntOrNull())
+                            )
+                        }
+                    }
                 }
             }
             
@@ -118,7 +134,6 @@ class ShortMax : MainAPI() {
     }
 
     override suspend fun load(url: String): LoadResponse {
-        // URL bisa berupa ID langsung atau URL lengkap
         val bookId = when {
             url.contains("/book/") -> url.substringAfterLast("/book/").substringBefore("?")
             url.contains("/") -> url.substringAfterLast("/").substringBefore("?")
