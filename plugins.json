@@ -29,6 +29,7 @@
         "authors": [
             "orcaplus"
         ],
+        "fileSize": 23166,
         "repositoryUrl": "https://github.com/orcaplus/Shorts",
         "language": "id",
         "tvTypes": [
@@ -37,7 +38,7 @@
         ],
         "iconUrl": "https://raw.githubusercontent.com/orcaplus/png/refs/heads/main/orcaplus.png",
         "apiVersion": 1,
-        "jarFileSize": 22,
+        "jarFileSize": 85670,
         "jarUrl": "https://raw.githubusercontent.com/orcaplus/Shorts/builds/ReelShort.jar"
     }
 ]
