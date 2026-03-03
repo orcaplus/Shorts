@@ -1,17 +1,14 @@
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-        maven("https://jitpack.io")
-        maven("https://maven.pkg.github.com/recloudstream/cloudstream") {
-            credentials {
-                username = project.findProperty("gpr.user") as? String ?: System.getenv("GITHUB_USER")
-                password = project.findProperty("gpr.key") as? String ?: System.getenv("GITHUB_TOKEN")
-            }
-        }
+rootProject.name = "RepoplusorcaPlugins"
+
+// This file sets what projects are included. All new projects should get automatically included unless specified in "disabled" variable.
+val disabled = listOf<String>()
+
+File(rootDir, ".").eachDir { dir ->
+    if (!disabled.contains(dir.name) && File(dir, "build.gradle.kts").exists()) {
+        include(dir.name)
     }
 }
 
-rootProject.name = "Repo"
-include(":app") // Ganti dengan nama module Anda, misalnya ":DramaBox" atau ":GoodShort"
+fun File.eachDir(block: (File) -> Unit) {
+    listFiles()?.filter { it.isDirectory }?.forEach { block(it) }
+}
