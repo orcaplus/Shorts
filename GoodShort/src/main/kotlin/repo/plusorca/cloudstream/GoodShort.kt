@@ -3,6 +3,7 @@ package repo.plusorca.cloudstream
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import com.google.gson.annotations.SerializedName
+import com.google.gson.Gson
 
 class GoodShort : MainAPI() {
     override var name = "GoodShort"
@@ -13,6 +14,7 @@ class GoodShort : MainAPI() {
     override var hasQuickSearch = false
     override var supportedTypes = setOf(TvType.TvSeries)
 
+    private val gson = Gson()
     private val apiBase = "https://goodshort.dramabos.my.id"
 
     // ==================== DATA CLASSES ====================
@@ -151,27 +153,30 @@ class GoodShort : MainAPI() {
         
         try {
             // Ambil navigasi untuk kategori
-            val navResponse = app.get("$apiBase/nav?lang=in").parsedSafe<NavResponse>()
+            val navResponse = parseJson<NavResponse>(app.get("$apiBase/nav?lang=in").text)
             
             navResponse?.data?.list?.forEach { navItem ->
                 if (navItem.channelId > 0 && navItem.channelId != 99) {
                     try {
                         val homeUrl = "$apiBase/home?lang=in&channel=${navItem.channelId}&page=1&size=20"
-                        val response = app.get(homeUrl).parsedSafe<HomeResponse>()
+                        val response = parseJson<HomeResponse>(app.get(homeUrl).text)
                         
                         response?.data?.records?.forEach { record ->
                             record.items?.let { items ->
                                 if (items.isNotEmpty()) {
                                     val dramaList = items.mapNotNull { item ->
-                                        item.toSearchResponse()
+                                        newSearchResponse(item.title) {
+                                            this.posterUrl = item.cover.ifEmpty { null }
+                                            this.plot = item.introduction
+                                            this.url = "/drama/${item.bookId}"
+                                        }
                                     }
                                     
                                     if (dramaList.isNotEmpty()) {
                                         homePageList.add(
                                             HomePageList(
                                                 navItem.title,
-                                                dramaList,
-                                                false
+                                                dramaList
                                             )
                                         )
                                     }
@@ -186,24 +191,21 @@ class GoodShort : MainAPI() {
             
             // Tambahkan halaman trending
             try {
-                val hotResponse = app.get("$apiBase/hot?lang=in").parsedSafe<HotResponse>()
+                val hotResponse = parseJson<HotResponse>(app.get("$apiBase/hot?lang=in").text)
                 val hotItems = mutableListOf<SearchResponse>()
                 
                 hotResponse?.data?.forEach { hotItem ->
                     try {
                         val bookId = hotItem.action
                         val detailUrl = "$apiBase/book/$bookId?lang=in"
-                        val detailResponse = app.get(detailUrl).parsedSafe<BookDetailResponse>()
+                        val detailResponse = parseJson<BookDetailResponse>(app.get(detailUrl).text)
                         
                         detailResponse?.data?.book?.let { book ->
                             hotItems.add(
-                                newTvSeriesSearchResponse(
-                                    name = book.bookName,
-                                    url = "/drama/${book.bookId}",
-                                    apiUrl = "/drama/${book.bookId}"
-                                ) {
+                                newSearchResponse(book.bookName) {
                                     this.posterUrl = book.cover
                                     this.plot = book.introduction
+                                    this.url = "/drama/${book.bookId}"
                                 }
                             )
                         }
@@ -216,65 +218,41 @@ class GoodShort : MainAPI() {
                     homePageList.add(
                         HomePageList(
                             "🔥 Trending",
-                            hotItems,
-                            false
+                            hotItems
                         )
                     )
                 }
             } catch (e: Exception) {
-                logError(e)
+                // Log error jika perlu
             }
             
         } catch (e: Exception) {
-            logError(e)
+            // Log error jika perlu
         }
         
         return HomePageResponse(homePageList)
     }
 
-    // Fungsi konversi DramaItem ke SearchResponse
-    private fun DramaItem.toSearchResponse(): SearchResponse? {
-        return try {
-            newTvSeriesSearchResponse(
-                name = title,
-                url = "/drama/$bookId",
-                apiUrl = "/drama/$bookId"
-            ) {
-                this.posterUrl = cover.ifEmpty { null }
-                this.plot = introduction
-                if (!viewCount.isNullOrEmpty()) {
-                    this.rating = parseViewCount(viewCount)
-                }
-            }
-        } catch (e: Exception) {
-            null
-        }
-    }
-
     // ==================== SEARCH ====================
     
-    override suspend fun search(query: String): List<SearchResponse> {
+    override suspend fun search(query: String): List<SearchResponse>? {
         val results = mutableListOf<SearchResponse>()
         
         try {
-            val url = "$apiBase/search?lang=in&q=${query.encodeUTF8()}&page=1&size=20"
-            val response = app.get(url).parsedSafe<SearchResponse>()
+            val url = "$apiBase/search?lang=in&q=${query.urlEncoded()}&page=1&size=20"
+            val response = parseJson<SearchResponse>(app.get(url).text)
             
             response?.data?.searchResult?.records?.forEach { item ->
                 results.add(
-                    newTvSeriesSearchResponse(
-                        name = item.bookName,
-                        url = "/drama/${item.bookId}",
-                        apiUrl = "/drama/${item.bookId}"
-                    ) {
+                    newSearchResponse(item.bookName) {
                         this.posterUrl = item.cover
                         this.plot = item.introduction
-                        item.viewCountDisplay?.let { this.rating = parseViewCount(it) }
+                        this.url = "/drama/${item.bookId}"
                     }
                 )
             }
         } catch (e: Exception) {
-            logError(e)
+            // Log error jika perlu
         }
         
         return results
@@ -282,52 +260,42 @@ class GoodShort : MainAPI() {
 
     // ==================== LOAD DETAIL ====================
     
-    override suspend fun load(url: String): LoadResponse {
+    override suspend fun load(url: String): LoadResponse? {
         val bookId = url.replace("/drama/", "")
         
         try {
             val detailUrl = "$apiBase/book/$bookId?lang=in"
-            val response = app.get(detailUrl).parsedSafe<BookDetailResponse>()
+            val response = parseJson<BookDetailResponse>(app.get(detailUrl).text)
             
             response?.data?.let { data ->
                 val book = data.book
                 val chapters = data.list
                 
-                val episodes = chapters.mapIndexed { index, chapter ->
-                    Episode(
-                        data = "${book.bookId}|${chapter.id}",
-                        name = chapter.chapterName,
-                        episode = index + 1,
-                        description = "Durasi: ${chapter.playTime ?: 0} detik\nViews: ${chapter.playCountDisplay ?: "0"}"
-                    )
+                val episodes = chapters.map { chapter ->
+                    newEpisode("${book.bookId}|${chapter.id}") {
+                        this.name = chapter.chapterName
+                        this.description = "Durasi: ${chapter.playTime ?: 0} detik\nViews: ${chapter.playCountDisplay ?: "0"}"
+                    }
                 }
                 
-                return newTvSeriesLoadResponse(
-                    name = book.bookName,
-                    url = url,
-                    apiUrl = url
-                ) {
+                val status = when (book.writeStatus) {
+                    "COMPLETE" -> ShowStatus.Completed
+                    else -> ShowStatus.Ongoing
+                }
+                
+                return newTvSeriesLoadResponse(book.bookName, url, TvType.TvSeries, episodes) {
                     this.posterUrl = book.cover
                     this.plot = book.introduction
                     this.tags = book.labels ?: emptyList()
-                    this.episodes = episodes
-                    
-                    book.viewCountDisplay?.let { this.rating = parseViewCount(it) }
-                    
-                    // Tambahkan informasi tambahan
                     this.year = null
-                    if (book.writeStatus == "COMPLETE") {
-                        this.status = ShowStatus.Completed
-                    } else {
-                        this.status = ShowStatus.Ongoing
-                    }
+                    this.status = status
                 }
             }
         } catch (e: Exception) {
-            logError(e)
+            // Log error jika perlu
         }
         
-        throw ErrorLoadingException("Drama tidak ditemukan")
+        return null
     }
 
     // ==================== LOAD LINKS ====================
@@ -347,59 +315,49 @@ class GoodShort : MainAPI() {
         try {
             // Dapatkan informasi video dari endpoint play
             val playUrl = "$apiBase/play/$chapterId?bookId=$bookId&lang=in"
-            val playResponse = app.get(playUrl).parsedSafe<PlayResponse>()
+            val playResponse = parseJson<PlayResponse>(app.get(playUrl).text)
             
             playResponse?.data?.multiVideos?.forEach { video ->
                 // Kualitas video
                 val quality = when (video.type) {
-                    "1080p" -> EnumQuality.FOURK.value
-                    "720p" -> EnumQuality.HD.value
-                    "540p" -> EnumQuality.SD.value
-                    else -> EnumQuality.Unknown.value
+                    "1080p" -> QUALITY_1080p
+                    "720p" -> QUALITY_720p
+                    "540p" -> QUALITY_540p
+                    else -> QUALITY_UNKNOWN
                 }
                 
                 // Panggil callback dengan link video
                 callback.invoke(
-                    ExtractorLink(
+                    newExtractorLink(
                         source = name,
                         name = "Drama Short [${video.type}]",
                         url = video.filePath,
-                        referer = mainUrl,
-                        quality = quality
-                    )
+                        referer = mainUrl
+                    ) {
+                        this.quality = quality
+                    }
                 )
             }
             
             return true
         } catch (e: Exception) {
-            logError(e)
+            // Log error jika perlu
         }
         
         return false
     }
 
     // ==================== HELPER FUNCTIONS ====================
-    
-    private fun parseViewCount(viewCount: String): Float {
-        return when {
-            viewCount.contains("M") -> {
-                viewCount.replace("M", "").toFloatOrNull()?.times(1000000) ?: 0f
-            }
-            viewCount.contains("K") -> {
-                viewCount.replace("K", "").toFloatOrNull()?.times(1000) ?: 0f
-            }
-            else -> {
-                viewCount.toFloatOrNull() ?: 0f
-            }
-        }
-    }
 
-    private inline fun <reified T> String.parsedSafe(): T? {
+    private inline fun <reified T> parseJson(json: String): T? {
         return try {
-            val gson = com.google.gson.Gson()
-            gson.fromJson(this, T::class.java)
+            gson.fromJson(json, T::class.java)
         } catch (e: Exception) {
             null
         }
+    }
+
+    private fun String.urlEncoded(): String {
+        return java.net.URLEncoder.encode(this, "utf-8")
     }
 }
