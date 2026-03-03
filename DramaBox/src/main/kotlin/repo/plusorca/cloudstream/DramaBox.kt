@@ -8,7 +8,7 @@ import com.lagradost.cloudstream3.utils.AppUtils.tryParseJson
 import com.lagradost.cloudstream3.utils.*
 
 class DramaBox : MainAPI() {
-    override var mainUrl = "https://dramabox.dramabos.my.id/"
+    override var mainUrl = "https://dramabox-beta-hazel.vercel.app"
     override var name = "DramaBox"
     override var lang = "id"
     override val hasMainPage = true
@@ -16,15 +16,15 @@ class DramaBox : MainAPI() {
     override val supportedTypes = setOf(TvType.TvSeries, TvType.AsianDrama)
 
     override val mainPage = mainPageOf(
-        "/api/v1/foryou" to "Untukmu",
-        "/api/v1/latest" to "Terbaru",
-        "/api/v1/trending" to "Trending",
-        "/api/v1/dubbed" to "Dub Indo",
+        "/api/dramabox/foryou" to "Untukmu",
+        "/api/dramabox/latest" to "Terbaru",
+        "/api/dramabox/trending" to "Trending",
+        "/api/dramabox/dubindo?classify=terbaru" to "Dub Indo",
     )
 
     private suspend fun fetchMainItems(path: String, page: Int): List<DramaItem> {
         val url = when {
-            path.contains("/api/v1/dubbed") -> {
+            path.contains("/api/dramabox/dubindo") -> {
                 val sep = if (path.contains("?")) "&" else "?"
                 "$mainUrl$path${sep}page=$page"
             }
@@ -63,10 +63,10 @@ class DramaBox : MainAPI() {
         if (q.isBlank()) return emptyList()
 
         val sourcePaths = listOf(
-            "/api/v1/foryou",
-            "/api/v1/latest",
-            "/api/v1/trending",
-            "/api/v1/dubbed",
+            "/api/dramabox/foryou",
+            "/api/dramabox/latest",
+            "/api/dramabox/trending",
+            "/api/dramabox/dubindo?classify=terbaru",
         )
 
         return sourcePaths
@@ -81,8 +81,8 @@ class DramaBox : MainAPI() {
 
     override suspend fun load(url: String): LoadResponse {
         val bookId = url.substringAfterLast("/").substringBefore("?")
-        val detailBody = app.get("$mainUrl/api/v1/detail/$bookId").text
-        val episodeBody = app.get("$mainUrl/api/v1/allepisode/$bookId").text
+        val detailBody = app.get("$mainUrl/api/dramabox/detail/$bookId").text
+        val episodeBody = app.get("$mainUrl/api/dramabox/allepisode/$bookId").text
 
         val detail = parseDetail(detailBody)
             ?: throw ErrorLoadingException("Detail tidak ditemukan")
@@ -127,7 +127,7 @@ class DramaBox : MainAPI() {
         val parsed = parseJson<LoadData>(data)
         val bookId = parsed.bookId ?: return false
 
-        val chapters = parseChapters(app.get("$mainUrl/api/v1/allepisode/$bookId").text)
+        val chapters = parseChapters(app.get("$mainUrl/api/dramabox/allepisode/$bookId").text)
         val chapter = chapters.firstOrNull { !parsed.chapterId.isNullOrBlank() && it.chapterId == parsed.chapterId }
             ?: chapters.firstOrNull { parsed.chapterIndex != null && it.chapterIndex == parsed.chapterIndex }
             ?: return false
