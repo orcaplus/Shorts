@@ -148,7 +148,7 @@ class DramaBox : MainAPI() {
                 newExtractorLink(
                     source = name,
                     name = buildString {
-                        append("Dramabox")
+                        append("DramaBox")
                         if (quality > 0) append(" ${quality}p")
                         if (cdnDomain.isNotBlank()) append(" - $cdnDomain")
                     },
