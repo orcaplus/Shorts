@@ -1,14 +1,17 @@
-rootProject.name = "Repo"
-
-// This file sets what projects are included. All new projects should get automatically included unless specified in "disabled" variable.
-val disabled = listOf<String>()
-
-File(rootDir, ".").eachDir { dir ->
-    if (!disabled.contains(dir.name) && File(dir, "build.gradle.kts").exists()) {
-        include(dir.name)
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven("https://jitpack.io")
+        maven("https://maven.pkg.github.com/recloudstream/cloudstream") {
+            credentials {
+                username = project.findProperty("gpr.user") as? String ?: System.getenv("GITHUB_USER")
+                password = project.findProperty("gpr.key") as? String ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 }
 
-fun File.eachDir(block: (File) -> Unit) {
-    listFiles()?.filter { it.isDirectory }?.forEach { block(it) }
-}
+rootProject.name = "Repo"
+include(":app") // Ganti dengan nama module Anda, misalnya ":DramaBox" atau ":GoodShort"
