@@ -82,7 +82,7 @@ subprojects {
     val implementation by configurations
     
     // Cloudstream dependencies - WAJIB
-    cloudstream("com.lagradost:cloudstream3:3.0.1")
+    cloudstream("com.lagradost:cloudstream3:pre-release")
 
     // Hanya gunakan SATU JSON parser: Jackson
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.16.0")
