@@ -82,17 +82,17 @@ subprojects {
     val implementation by configurations
     
     // Cloudstream dependencies - WAJIB
-    cloudstream("com.lagradost:cloudstream3:pre-release")
+    cloudstream("com.lagradost:cloudstream3:3.0.0)
 
     // Hanya gunakan SATU JSON parser: Jackson
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.16.0")
     
     // Optional tapi sering dipakai
-    implementation("org.jsoup:jsoup:1.18.3") // Untuk parsing HTML (optional)
+    implementation("org.jsoup:jsoup:1.17.2") // Untuk parsing HTML (optional)
     
     // HAPUS SEMUA INI:
     // implementation("com.github.Blatzar:NiceHttp:0.4.13") // Cloudstream sudah punya app.get
-    // implementation("com.google.code.gson:gson:2.11.0") // KONFLIK dengan Jackson
+    // implementation("com.google.code.gson:gson:2.10.1") // KONFLIK dengan Jackson
     // implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3") // KONFLIK dengan Jackson
     // implementation("app.cash.quickjs:quickjs-android:0.9.2") // Tidak diperlukan
     // implementation("com.squareup.okhttp3:okhttp:4.12.0") // Cloudstream sudah punya
